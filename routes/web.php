@@ -15,10 +15,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// 通常のページの表示にはgetを受け取り、フォームを送信したときに受け取る場合にはpostを受け取るように設定
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+    // news用Routing
     Route::get('news/create', 'Admin\NewsController@add');
+    Route::post('news/create', 'Admin\NewsController@create');
+    // profile用Routing
     Route::get('profile/create', 'Admin\ProfileController@add');
-    Route::get('profile/create', 'Admin\ProfileController@edit');
+    Route::post('profile/create', 'Admin\ProfileController@create');
+    Route::get('profile/edit', 'Admin\ProfileController@edit');
 });
 
 Auth::routes();
