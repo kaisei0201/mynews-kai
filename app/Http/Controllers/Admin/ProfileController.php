@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 // 以下を追記することでProfile Modelが扱えるようになる
 use App\Profile;
+use App\Histories2;
+use Carbon\Carbon;
+
 
 class ProfileController extends Controller
 {
@@ -13,6 +16,18 @@ class ProfileController extends Controller
     {
         return view('admin.profile.create');
     }
+    
+    public function index(Request $request)
+    {
+        $cond_title = $request->cond_title;
+        if ($cond_title != '') {
+            $posts = Profile::where('title', $cond_title)->get();
+        } else {
+            $posts = Profile::all();
+        }
+        return view('admin.profile.index', ['posts' => $posts, 'cond_title' => $cond_title]);
+    }
+    
     public function create(Request $request)
     {
         // Varidationを行う
@@ -27,6 +42,7 @@ class ProfileController extends Controller
         // admin/profile/createにリダイレクトする
         return redirect('admin/profile/create');
     }
+    
     public function edit(Request $request)
     {
         // Profile Modelからデータを取得する
@@ -47,9 +63,24 @@ class ProfileController extends Controller
         // 送信されてきたフォームデータを格納する
         $profile_form = $request->all();
         unset($profile_form['_token']);
-
         // 該当するデータを上書きして保存する
         $profile->fill($profile_form)->save();
-        return redirect('admin/profile');
+        
+        $history = new Histories2;
+        $history->profile_id = $profile->id;
+        $history->edited_at = Carbon::now();
+        $history->save();
+
+        return redirect('admin/profile/');
+    }
+    
+    public function delete(Request $request)
+    {
+    // 該当する Profile Modelを取得
+    $profile = Profile::find($request->id);
+    // 削除する
+    $profile->delete();
+    
+    return redirect('admin/profile/');
     }
 }
