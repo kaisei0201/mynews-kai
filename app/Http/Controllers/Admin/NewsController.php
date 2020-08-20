@@ -78,7 +78,7 @@ class NewsController extends Controller
         } elseif ($request->file('image')) {
             //$path = $request->file('image')->store('public/image');
             //$news_form['image_path'] = basename($path);
-            $path = Storage::disk('s3')->putFile('/',$news_form['image_path'],'public');
+            $path = Storage::disk('s3')->putFile('/',$news_form['image'],'public');
             $news->image_path = Storage::disk('s3')->url($path);
         } else {
             $news_form['image_path'] = $news->image_path;
